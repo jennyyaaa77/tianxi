@@ -128,11 +128,11 @@
     .screen-thumb {
       background: #ffffff; border-radius: 0.5rem; overflow: hidden;
       box-shadow: 0 4px 10px rgba(0,0,0,0.04); flex: 1; min-width: 0;
-      max-height: 140px; transition: all 0.2s; border: 1px solid #ddd;
+      height: 140px; transition: all 0.2s; border: 1px solid #ddd;
       cursor: pointer; position: relative;
     }
     .screen-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; image-rendering: -webkit-optimize-contrast; }
-    .screenshot-area.single .screen-thumb { max-height: 180px; max-width: 280px; flex: none; }
+    .screenshot-area.single .screen-thumb { height: 140px; max-width: none; flex: 1; }
     .screen-thumb:hover { box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
     .screen-thumb .zoom-icon {
       position: absolute; bottom: 6px; right: 6px;
@@ -630,5 +630,6 @@
     // Init
     renderAll();
   </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
