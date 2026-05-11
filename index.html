@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>ISSC · Workflow Showcase</title>
+  <title>SuperClaw: AI Agents for Work and Life</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -227,6 +227,26 @@
       border: 1px solid #edf2f9;
     }
 
+    /* Crawling Claw Animation */
+    .crawling-claw {
+      font-size: 3.5rem; opacity: 0.85;
+      animation: crawlLeftToRight 6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes crawlLeftToRight {
+      0%   { transform: translateX(-60px) scaleX(-1) rotate(0deg); }
+      10%  { transform: translateX(-40px) scaleX(-1) rotate(-8deg); }
+      20%  { transform: translateX(-20px) scaleX(-1) rotate(0deg); }
+      30%  { transform: translateX(0px) scaleX(-1) rotate(8deg); }
+      40%  { transform: translateX(20px) scaleX(-1) rotate(0deg); }
+      50%  { transform: translateX(40px) scaleX(-1) rotate(-8deg); }
+      60%  { transform: translateX(60px) scaleX(-1) rotate(0deg); }
+      70%  { transform: translateX(80px) scaleX(-1) rotate(8deg); }
+      80%  { transform: translateX(100px) scaleX(-1) rotate(0deg); }
+      90%  { transform: translateX(120px) scaleX(-1) rotate(-8deg); }
+      100% { transform: translateX(140px) scaleX(-1) rotate(0deg); }
+    }
+
     /* Footer */
     .footer-note {
       text-align: center; margin-top: 2.5rem; color: #5e7188;
@@ -254,7 +274,7 @@
           <span class="claw-badge"><i class="fas fa-bolt"></i> ISSC</span>
         </div>
       </div>
-      <div style="font-size: 3.5rem; opacity: 0.7;">🦞</div>
+      <div class="crawling-claw">🦞</div>
     </div>
 
     <!-- Stats -->
@@ -300,7 +320,7 @@
     let currentLang = 'zh';
     const i18n = {
       zh: {
-        heroTitle: '🦐 天禧Claw · 工作流进化',
+        heroTitle: 'SuperClaw: AI Agents for Work and Life',
         heroSub: 'Xiaodan Yang 成果展示',
         langLabel: 'English',
         footer: '天禧Claw · 开启自动化办公新时代 · 感谢天禧Claw team',
@@ -320,7 +340,7 @@
         close: '关闭'
       },
       en: {
-        heroTitle: '🦐 TianXi Claw · Workflow Evolution',
+        heroTitle: 'SuperClaw: AI Agents for Work and Life',
         heroSub: 'Xiaodan Yang Portfolio',
         langLabel: '中文',
         footer: 'TianXi Claw · Powering Office Automation · Thanks to TianXi Claw Team',
@@ -630,6 +650,7 @@
     // Init
     renderAll();
   </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
