@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ISSC · Workflow Showcase</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f0f4f8;
+      font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+    }
+    .dashboard { max-width: 1800px; width: 100%; }
+    .hero {
+      background: linear-gradient(105deg, #0b2b4f 0%, #1a3f5c 100%);
+      border-radius: 2.5rem; padding: 2.5rem 2.8rem; margin-bottom: 1.5rem;
+      color: white; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      box-shadow: 0 25px 40px -15px rgba(0,20,40,0.35);
+    }
+    .hero-left h1 { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
+    .hero-left .sub {
+      color: #b6cdff; font-size: 1.2rem; font-weight: 400;
+      display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
+    }
+    .claw-badge {
+      background: #ff6b35; padding: 0.3rem 1.2rem; border-radius: 3rem;
+      font-weight: 700; font-size: 0.9rem; letter-spacing: 0.3px; color: #fff;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex; gap: 1.2rem; margin-bottom: 1.2rem; flex-wrap: wrap;
+    }
+    .stat-item {
+      background: #ffffff; border: 1px solid #edf2f9; border-radius: 1.2rem;
+      padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.8rem;
+      flex: 1; min-width: 140px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .stat-icon { font-size: 1.5rem; color: #1f3a5f; }
+    .stat-num { font-size: 1.8rem; font-weight: 800; color: #0b2b4f; }
+    .stat-label { font-size: 0.75rem; color: #5e7188; font-weight: 600; }
+
+    /* Controls Bar */
+    .controls-bar {
+      display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center;
+      margin-bottom: 1.2rem;
+    }
+    .search-box { flex: 1; min-width: 200px; max-width: 360px; position: relative; }
+    .search-box input {
+      width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem;
+      background: #ffffff; border: 1px solid #dde4ee; border-radius: 1.2rem;
+      color: #0b2b4f; font-size: 0.95rem; outline: none; transition: all 0.3s;
+    }
+    .search-box input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .search-box input::placeholder { color: #94a3b8; }
+    .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .sort-btn, .lang-toggle {
+      background: #ffffff; border: 1px solid #dde4ee; color: #33475b;
+      padding: 0.7rem 1.4rem; border-radius: 1.2rem; font-weight: 600;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .sort-btn:hover, .lang-toggle:hover { background: #f0f4f8; border-color: #c0cfe0; }
+
+    /* Category Tabs */
+    .category-tabs { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .tab-btn {
+      background: #ffffff; border: 1px solid #dde4ee; color: #5e7188;
+      padding: 0.65rem 1.6rem; border-radius: 2.5rem; font-weight: 600;
+      font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .tab-btn i { font-size: 0.9rem; }
+    .tab-btn.active {
+      background: #ff6b35; border-color: #ff6b35; color: white;
+      box-shadow: 0 10px 18px -6px rgba(255,107,53,0.4);
+    }
+    .tab-btn:hover:not(.active) { background: #f7f9fc; border-color: #c0cfe0; }
+
+    /* Grid - wide layout */
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Card */
+    .tool-card {
+      background: #ffffff; border-radius: 1.8rem; padding: 1.5rem;
+      box-shadow: 0 12px 28px -10px rgba(0,0,0,0.08); transition: all 0.3s ease;
+      display: flex; flex-direction: column; border: 1px solid #edf2f9;
+      position: relative; opacity: 0; transform: translateY(30px);
+    }
+    .tool-card.visible { opacity: 1; transform: translateY(0); }
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 22px 35px -14px rgba(0,32,64,0.15); border-color: #cdddec;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.8rem; }
+    .tool-icon {
+      background: #f0f5ff; width: 2.6rem; height: 2.6rem; border-radius: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; color: #1f3a5f;
+    }
+    .tool-name { font-weight: 700; font-size: 1.15rem; color: #0b2b4f; letter-spacing: -0.2px; }
+    .tool-category {
+      font-size: 0.65rem; background: #eef2f6; padding: 0.2rem 0.6rem;
+      border-radius: 20px; color: #2c4a6e; margin-left: 0.3rem; font-weight: 600;
+    }
+    .featured-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      background: linear-gradient(135deg, #ff6b35, #f59e0b);
+      color: #fff; font-size: 0.65rem; font-weight: 700;
+      padding: 0.2rem 0.7rem; border-radius: 1rem;
+    }
+    .summary { color: #33475b; font-size: 0.85rem; line-height: 1.55; margin-bottom: 0.8rem; flex: 1; }
+
+    /* Screenshots */
+    .screenshot-area {
+      background: #f7f9fc; border-radius: 1rem; padding: 0.6rem;
+      margin: 0.5rem 0 0.8rem; display: flex; gap: 0.5rem;
+      justify-content: center; align-items: flex-start; flex-wrap: nowrap;
+      border: 1px solid #e9eff4;
+    }
+    .screen-thumb {
+      background: #ffffff; border-radius: 0.5rem; overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04); flex: 1; min-width: 0;
+      max-height: 140px; transition: all 0.2s; border: 1px solid #ddd;
+      cursor: pointer; position: relative;
+    }
+    .screen-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; image-rendering: -webkit-optimize-contrast; }
+    .screenshot-area.single .screen-thumb { max-height: 180px; max-width: 280px; flex: none; }
+    .screen-thumb:hover { box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+    .screen-thumb .zoom-icon {
+      position: absolute; bottom: 6px; right: 6px;
+      background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7rem;
+      padding: 3px 7px; border-radius: 5px; pointer-events: none;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .screen-thumb:hover .zoom-icon { opacity: 1; }
+
+    /* Tags */
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .feature-tag {
+      background: #f0f4fa; color: #1f3a5f; font-size: 0.68rem;
+      font-weight: 600; padding: 0.2rem 0.65rem; border-radius: 1rem;
+    }
+
+    /* Detail Button */
+    .detail-btn {
+      margin-top: 0.8rem; padding: 0.55rem 1.1rem;
+      border: 1px solid #cdddec; background: #f0f5ff; color: #1f3a5f;
+      border-radius: 0.8rem; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; display: flex;
+      align-items: center; gap: 0.5rem; width: fit-content;
+    }
+    .detail-btn:hover { background: #dbeafe; border-color: #93b4d4; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 2rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: #ffffff; border: 1px solid #edf2f9; border-radius: 2rem;
+      max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto;
+      padding: 2.5rem; position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+    .modal-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: #f0f4f8; border: none; color: #5e7188;
+      font-size: 1.2rem; width: 38px; height: 38px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover { background: #e2e8f0; color: #0b2b4f; }
+    .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #0b2b4f; }
+    .modal-category { font-size: 0.8rem; color: #ff6b35; margin-bottom: 1.2rem; font-weight: 600; }
+    .modal-desc { color: #33475b; line-height: 1.7; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .modal-section-title { font-size: 0.9rem; font-weight: 700; color: #1f3a5f; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+    .modal-features { list-style: none; margin-bottom: 1.5rem; }
+    .modal-features li {
+      padding: 0.5rem 0; color: #33475b; font-size: 0.88rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .modal-features li i { color: #22c55e; font-size: 0.8rem; }
+    .modal-screenshots { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .modal-screenshots img {
+      border-radius: 0.8rem; max-height: 200px; cursor: pointer;
+      border: 1px solid #e9eff4; transition: all 0.3s;
+    }
+    .modal-screenshots img:hover { border-color: #93b4d4; transform: scale(1.02); }
+
+    /* Lightbox */
+    .lightbox-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+      padding: 20px; cursor: zoom-out; overflow: auto;
+    }
+    .lightbox-overlay.active { display: flex; }
+    .lightbox-overlay img {
+      max-width: 96vw; max-height: 96vh; border-radius: 8px;
+      box-shadow: 0 0 60px rgba(0,0,0,0.5); object-fit: contain;
+      image-rendering: -webkit-optimize-contrast; transition: transform 0.3s ease;
+    }
+    .lightbox-overlay img.zoomed { max-width: none; max-height: none; cursor: grab; transform: scale(2); }
+    .lightbox-close {
+      position: fixed; top: 18px; right: 24px; z-index: 10000;
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      font-size: 1.6rem; width: 44px; height: 44px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px); transition: background 0.2s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+    /* Empty */
+    .empty-state {
+      grid-column: 1/-1; text-align: center; padding: 3rem;
+      color: #5e7188; background: #fff; border-radius: 1.5rem;
+      border: 1px solid #edf2f9;
+    }
+
+    /* Footer */
+    .footer-note {
+      text-align: center; margin-top: 2.5rem; color: #5e7188;
+      font-size: 0.9rem; display: flex; align-items: center;
+      justify-content: center; gap: 0.5rem;
+    }
+
+    @media (max-width: 650px) {
+      .hero { padding: 1.8rem; }
+      .hero-left h1 { font-size: 2rem; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .stats-bar { gap: 0.6rem; }
+      .modal-content { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-left">
+        <h1 id="heroTitle"></h1>
+        <div class="sub">
+          <span id="heroSub"></span>
+          <span class="claw-badge"><i class="fas fa-bolt"></i> ISSC</span>
+        </div>
+      </div>
+      <div style="font-size: 3.5rem; opacity: 0.7;">🦞</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="statsBar"></div>
+
+    <!-- Controls -->
+    <div class="controls-bar">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="" oninput="handleSearch()">
+      </div>
+      <button class="sort-btn" id="sortBtn" onclick="toggleSort()">
+        <i class="fas fa-sort"></i> <span id="sortLabel"></span>
+      </button>
+      <button class="lang-toggle" id="langBtn" onclick="toggleLang()">
+        <i class="fas fa-language"></i> <span id="langLabel"></span>
+      </button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="categoryTabs"></div>
+
+    <!-- Grid -->
+    <div class="tools-grid" id="toolsContainer"></div>
+
+    <!-- Footer -->
+    <div class="footer-note" id="footerNote"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" title="Close"><i class="fas fa-times"></i></button>
+    <img id="lightbox-img" src="" alt="enlarged">
+  </div>
+
+  <script>
+    // === i18n ===
+    let currentLang = 'zh';
+    const i18n = {
+      zh: {
+        heroTitle: '🦐 天禧Claw · 工作流进化',
+        heroSub: 'Xiaodan Yang 成果展示',
+        langLabel: 'English',
+        footer: '天禧Claw · 开启自动化办公新时代 · 感谢天禧Claw team',
+        tabs: { all: '全部', feature: '重点产品', 'mini-program': '智能小程序', website: '专属网站', plugin: 'Claw插件/小工具', prompt: 'Prompt自动流' },
+        categoryLabels: { 'mini-program': '智能小程序', website: '专属网站', plugin: 'Claw插件', prompt: 'Prompt自动流', feature: '重点产品' },
+        empty: '该分类下暂无工具展示',
+        clickHint: '点击截图放大预览',
+        searchPlaceholder: '搜索工具名称...',
+        sortDefault: '默认排序',
+        sortName: '按名称',
+        detail: '查看详情',
+        features: '核心功能',
+        scenes: '应用场景',
+        statsTools: '工具总数',
+        statsCategories: '分类数',
+        statsAuto: '自动化流',
+        close: '关闭'
+      },
+      en: {
+        heroTitle: '🦐 TianXi Claw · Workflow Evolution',
+        heroSub: 'Xiaodan Yang Portfolio',
+        langLabel: '中文',
+        footer: 'TianXi Claw · Powering Office Automation · Thanks to TianXi Claw Team',
+        tabs: { all: 'All', feature: 'Featured', 'mini-program': 'Mini Programs', website: 'Websites', plugin: 'Plugins/Tools', prompt: 'Prompt Automation' },
+        categoryLabels: { 'mini-program': 'Mini Program', website: 'Website', plugin: 'Plugin', prompt: 'Prompt Flow', feature: 'Featured' },
+        empty: 'No tools in this category yet.',
+        clickHint: 'Click to enlarge',
+        searchPlaceholder: 'Search tools...',
+        sortDefault: 'Default',
+        sortName: 'By Name',
+        detail: 'View Details',
+        features: 'Key Features',
+        scenes: 'Use Cases',
+        statsTools: 'Total Tools',
+        statsCategories: 'Categories',
+        statsAuto: 'Automations',
+        close: 'Close'
+      }
+    };
+
+    // === TOOLS DATA ===
+    const tools = [
+      {
+        id: 1, category: "mini-program", featured: true, icon: "fa-baby",
+        name: { zh: "育儿小程序 SmartBaby", en: "SmartBaby Parenting App" },
+        summary: {
+          zh: "智能育儿助手，多宝宝一键切换，双模式喂奶/睡眠记录，内置AI睡眠预测引擎，今日仪表盘一目了然。",
+          en: "Smart parenting assistant with multi-baby switch, dual-mode feeding & sleep tracking, AI sleep prediction engine, and a daily overview dashboard."
+        },
+        screenshots: ["images/smartbaby1.png", "images/smartbaby2.png"],
+        tags: { zh: ["多娃切换", "双模式记录", "AI睡眠预测", "喂养分类"], en: ["Multi-baby", "Dual-mode", "AI Sleep Predict", "Feed Categories"] },
+        features: { zh: ["多宝宝档案管理与一键切换", "实时计时器 + 手动补录双模式", "睡眠AI预测引擎 (Wake Window算法)", "今日概览仪表盘：奶量/睡眠/尿裤", "扩展喂养分类：母乳/瓶喂/辅食/补剂", "深度数据统计：日/周/月趋势图"], en: ["Multi-baby profile management & one-tap switch", "Real-time timer + manual entry dual mode", "Sleep AI prediction engine (Wake Window algorithm)", "Today's overview dashboard: milk/sleep/diapers", "Extended feeding: breast/bottle/solids/supplements", "Deep analytics: day/week/month trend charts"] },
+        scenes: { zh: ["新手父母日常喂养记录", "双胞胎/多娃家庭管理", "月嫂交接记录", "宝宝睡眠规律分析"], en: ["Daily feeding logs for new parents", "Twin/multi-baby family management", "Nanny handover records", "Baby sleep pattern analysis"] }
+      },
+      {
+        id: 2, category: "website", featured: true, icon: "fa-toolbox",
+        name: { zh: "Supply X AI Studio 百宝箱", en: "Supply X AI Studio Toolbox" },
+        summary: {
+          zh: "团队内部工具共享平台，AI智能路由匹配需求，需求墙接单协作，数据看板追踪使用与贡献排名，零部署开箱即用。",
+          en: "Internal tool-sharing platform with AI smart routing, Demand Wall for collaboration, usage analytics dashboard, and contributor rankings. Zero deployment."
+        },
+        screenshots: ["images/logiagent1.png", "images/logiagent2.png"],
+        tags: { zh: ["AI路由", "需求墙", "数据看板", "评价体系"], en: ["AI Routing", "Demand Wall", "Dashboard", "Rating System"] },
+        features: { zh: ["AI智能路由引擎：自然语言匹配最佳工具", "12大分类检索，卡片式工具展示", "需求墙：结构化提交+社区投票+状态追踪", "数据看板：调用量排名+贡献者排行榜", "星级评分+用户评论反馈机制", "拖拽上传附件，全功能CRUD编辑"], en: ["AI smart routing: natural language to best tool match", "12-category search with card-style display", "Demand Wall: structured submit + voting + tracking", "Dashboard: usage rankings + contributor leaderboard", "Star rating + user review feedback", "Drag-drop upload, full CRUD editing"] },
+        scenes: { zh: ["团队内部工具共享与复用", "跨部门协作创新", "避免重复开发资源浪费", "工具生命周期管理"], en: ["Internal team tool sharing & reuse", "Cross-department collaboration", "Avoiding duplicate development", "Tool lifecycle management"] }
+      },
+      {
+        id: 3, category: "website", featured: true, icon: "fa-ship",
+        name: { zh: "TradePilot 关务领航者", en: "TradePilot Customs Navigator" },
+        summary: {
+          zh: "关务合规一站式平台，25国关税秒算、FTA自动匹配、HS智能归类、合规制裁扫描、批量查询、物流追踪与实时汇率，全部接入真实API。",
+          en: "One-stop customs platform: 25-country tariff calc, FTA matching, smart HS classification, compliance scanning, batch queries, logistics tracking & live exchange rates — all via real APIs."
+        },
+        screenshots: ["images/tradepilot1.png", "images/tradepilot2.png"],
+        tags: { zh: ["25国关税", "HS归类", "合规检查", "物流追踪"], en: ["25-Country Tariff", "HS Classification", "Compliance", "Logistics"] },
+        features: { zh: ["25国关税测算：HS编码一秒出结果，FTA自动匹配", "HS智能归类：文字描述推荐Top3/5/10，准确率90%+", "AI图像归类：TensorFlow.js + MobileNet本地推理", "贸易风险合规：制裁名单/出口管制/AI深度分析", "批量HS查询与关税测算：Excel导入导出", "落地成本估算器：海运/空运/快递全链路费用拆解", "国际物流追踪：自动识别承运商一键跳转", "实时汇率引擎：7币种折算+7/30/90天历史图表", "全球贸易资讯：11源RSS实时聚合"], en: ["25-country tariff calc: 1-second HS results, FTA auto-match", "Smart HS classification: text to Top 3/5/10 codes, 90%+ accuracy", "AI image classification: TensorFlow.js + MobileNet local inference", "Trade risk compliance: sanctions/export controls/AI deep analysis", "Batch HS query & tariff calc: Excel import/export", "Landed cost estimator: sea/air/express full-chain breakdown", "Logistics tracking: auto-detect carrier, one-click redirect", "Real-time exchange rates: 7 currencies + historical charts", "Global trade news: 11-source RSS aggregation"] },
+        scenes: { zh: ["进出口报关决策", "贸易合规审查", "关税成本优化", "批量编码查询与归类"], en: ["Import/export customs decisions", "Trade compliance review", "Tariff cost optimization", "Batch code lookup & classification"] }
+      },
+      {
+        id: 4, category: "website", featured: true, icon: "fa-file-alt",
+        name: { zh: "SmartBrief 智能简报", en: "SmartBrief Report Generator" },
+        summary: {
+          zh: "七步向导报告生成器，6种模板+9种图表+AI智能分析（SWOT/竞品/风险），Excel驱动图表，多格式导出，品牌自定义，纯前端即用。",
+          en: "7-step report wizard with 6 templates, 9 chart types, AI-powered SWOT/risk analysis, Excel-driven charts, multi-format export, and brand customization. Pure frontend."
+        },
+        screenshots: ["images/smartbrief1.png", "images/smartbrief2.png"],
+        tags: { zh: ["七步向导", "9种图表", "AI分析", "品牌定制"], en: ["7-Step Wizard", "9 Charts", "AI Analysis", "Brand Custom"] },
+        features: { zh: ["七步向导式报告生成流程", "6种专业模板：业务/项目/财务/营销/研究+自定义", "9种图表：柱/线/饼/雷达/散点/组合图等", "AI智能分析：SWOT/竞品/风险/异常检测/趋势预测", "KPI多维度卡片：同比/环比/目标/预算自动计算", "Excel数据驱动图表生成", "多格式导出：HTML/PDF/PNG/打印+在线分享", "品牌自定义：Logo/色系/字体/水印/机密等级"], en: ["7-step wizard report generation", "6 templates: business/project/finance/marketing/research + custom", "9 chart types: bar/line/pie/radar/scatter/combo etc.", "AI analysis: SWOT/competitive/risk/anomaly/trend prediction", "KPI multi-dimension cards: YoY/MoM/target/budget auto-calc", "Excel-driven chart generation", "Multi-format export: HTML/PDF/PNG/print + share link", "Brand customization: logo/colors/fonts/watermark/confidentiality"] },
+        scenes: { zh: ["周报/月报快速生成", "项目立项分析报告", "竞品分析文档", "财务数据可视化报告"], en: ["Quick weekly/monthly reports", "Project proposal analysis", "Competitive analysis docs", "Financial data visualization"] }
+      },
+      {
+        id: 5, category: "plugin", icon: "fa-clock",
+        name: { zh: "专注番茄钟", en: "Focus Pomodoro Timer" },
+        summary: {
+          zh: "番茄工作法专注助手，25+5循环，屏蔽干扰通知，统计每日专注时长，告别注意力碎片化。",
+          en: "Pomodoro focus assistant with 25+5 cycles, notification blocking, and daily focus time tracking."
+        },
+        screenshots: ["images/focus1.png", "images/focus2.png"],
+        tags: { zh: ["番茄工作法", "代办清单", "专注模式"], en: ["Pomodoro", "To-do List", "Focus Mode"] },
+        features: { zh: ["25+5分钟标准番茄循环", "干扰通知智能屏蔽", "每日专注时长统计", "待办任务清单集成", "自定义工作/休息时长"], en: ["Standard 25+5 Pomodoro cycles", "Smart notification blocking", "Daily focus time stats", "Integrated task list", "Custom work/break durations"] },
+        scenes: { zh: ["深度工作专注时段", "备考学习计时", "远程办公效率提升"], en: ["Deep work focus sessions", "Study timer for exams", "Remote work productivity"] }
+      },
+      {
+        id: 6, category: "plugin", icon: "fa-chart-bar",
+        name: { zh: "Excel动态看板", en: "Excel Dynamic Dashboard" },
+        summary: {
+          zh: "上传Excel自动生成交互式仪表盘，里程碑实时同步，让表格具备专业可视化能力。",
+          en: "Upload Excel to auto-generate interactive dashboards with real-time milestone sync and professional visualizations."
+        },
+        screenshots: ["images/excel1.png", "images/excel2.png"],
+        tags: { zh: ["模板下载", "前端解析", "自动计算"], en: ["Template DL", "Frontend Parse", "Auto Calc"] },
+        features: { zh: ["拖拽上传Excel即时解析", "自动生成交互式图表", "里程碑进度实时同步", "模板下载快速启动", "多维度数据筛选"], en: ["Drag-drop Excel instant parsing", "Auto-generated interactive charts", "Real-time milestone sync", "Template download quick-start", "Multi-dimensional filtering"] },
+        scenes: { zh: ["项目进度可视化", "销售数据实时看板", "OKR目标追踪"], en: ["Project progress visualization", "Real-time sales dashboard", "OKR goal tracking"] }
+      },
+      {
+        id: 7, category: "prompt", icon: "fa-newspaper",
+        name: { zh: "每日情报官", en: "Daily Intelligence Officer" },
+        summary: {
+          zh: "工作日定时扫描全网热点，AI总结3条核心资讯推送至邮箱/企微/钉钉，变被动搜索为主动投喂。",
+          en: "Auto-scans web on workdays, AI-summarizes top 3 insights, and pushes to email/WeChat/DingTalk. Passive search turned proactive."
+        },
+        screenshots: ["images/news1.png"],
+        tags: { zh: ["定时抓取", "多端推送", "资讯过滤"], en: ["Scheduled Fetch", "Multi-push", "News Filter"] },
+        features: { zh: ["工作日定时自动触发", "全网科技热点扫描", "AI智能摘要3条精华", "邮箱/企微/钉钉多端推送", "关键词过滤与偏好设置"], en: ["Workday auto-trigger", "Web-wide tech scanning", "AI summary of top 3 insights", "Email/WeChat/DingTalk push", "Keyword filter & preferences"] },
+        scenes: { zh: ["每日晨间信息速览", "行业动态追踪", "团队信息同步"], en: ["Morning news briefing", "Industry trend tracking", "Team info sync"] }
+      },
+      {
+        id: 8, category: "prompt", icon: "fa-desktop",
+        name: { zh: "桌面整理神器", en: "Desktop Auto-Organizer" },
+        summary: {
+          zh: "一键按类型归类桌面文件，自动建文件夹并保留快捷方式，下班前一键清理，治愈强迫症。",
+          en: "One-click desktop file sorting by type, auto-creates folders while keeping shortcuts. Minimal desktop before you leave work."
+        },
+        screenshots: ["images/desktop1.png", "images/desktop2.png"],
+        tags: { zh: ["自动归类", "快捷方式保留", "一键清理"], en: ["Auto Sort", "Shortcuts Kept", "One-click Clean"] },
+        features: { zh: ["智能文件类型识别", "自动创建分类文件夹", "快捷方式原位保留", "一键桌面清理", "定时自动整理计划"], en: ["Smart file type detection", "Auto-create categorized folders", "Keep shortcuts in place", "One-click desktop cleanup", "Scheduled auto-organize"] },
+        scenes: { zh: ["下班前桌面清理", "文件管理强迫症治愈", "共享电脑规范管理"], en: ["End-of-day desktop cleanup", "File organization for neat freaks", "Shared computer management"] }
+      },
+      {
+        id: 9, category: "prompt", icon: "fa-code-compare",
+        name: { zh: "数据对比秘书", en: "Data Comparison Secretary" },
+        summary: {
+          zh: "以订单号为Key自动匹配差异，识别新增/删除/状态变化，秒级生成Excel对比报告，告别人工核对。",
+          en: "Auto-matches by order ID, detects additions/deletions/changes, and generates an Excel diff report in seconds. No manual checking."
+        },
+        screenshots: ["images/datacompare1.png", "images/datacompare2.png"],
+        tags: { zh: ["自动匹配", "差异报告", "批量处理"], en: ["Auto Match", "Diff Report", "Batch Process"] },
+        features: { zh: ["订单号智能Key匹配", "新增/删除/变更自动识别", "差异高亮Excel报告", "批量文件处理", "自定义匹配字段"], en: ["Smart order ID key matching", "Auto detect add/delete/change", "Highlighted diff Excel report", "Batch file processing", "Custom match fields"] },
+        scenes: { zh: ["订单数据版本对比", "库存盘点差异分析", "合同条款变更追踪"], en: ["Order data version comparison", "Inventory diff analysis", "Contract change tracking"] }
+      }
+    ];
+
+    // === STATE ===
+    let currentCategory = 'all';
+    let currentSort = 'default';
+    let searchQuery = '';
+
+    // === RENDER ===
+    function renderAll() {
+      const t = i18n[currentLang];
+      document.getElementById('heroTitle').textContent = t.heroTitle;
+      document.getElementById('heroSub').textContent = t.heroSub;
+      document.getElementById('langLabel').textContent = t.langLabel;
+      document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+      document.getElementById('sortLabel').textContent = currentSort === 'default' ? t.sortDefault : t.sortName;
+      document.getElementById('footerNote').innerHTML = '<i class="fas fa-robot"></i> ' + t.footer;
+
+      // Stats
+      const statsHtml =
+        '<div class="stat-item"><div class="stat-icon"><i class="fas fa-cubes"></i></div><div><div class="stat-num">'+tools.length+'</div><div class="stat-label">'+t.statsTools+'</div></div></div>' +
+        '<div class="stat-item"><div class="stat-icon"><i class="fas fa-layer-group"></i></div><div><div class="stat-num">4</div><div class="stat-label">'+t.statsCategories+'</div></div></div>' +
+        '<div class="stat-item"><div class="stat-icon"><i class="fas fa-star"></i></div><div><div class="stat-num">'+tools.filter(t=>t.featured).length+'</div><div class="stat-label">'+(currentLang==='zh'?'重点产品':'Featured')+'</div></div></div>' +
+        '<div class="stat-item"><div class="stat-icon"><i class="fas fa-magic"></i></div><div><div class="stat-num">'+tools.filter(t=>t.category==='prompt').length+'</div><div class="stat-label">'+t.statsAuto+'</div></div></div>';
+      document.getElementById('statsBar').innerHTML = statsHtml;
+
+      // Tabs
+      const tabsContainer = document.getElementById('categoryTabs');
+      const categories = ['all', 'feature', 'mini-program', 'website', 'plugin', 'prompt'];
+      const tabIcons = { all: 'fa-border-all', feature: 'fa-star', 'mini-program': 'fa-mobile-alt', website: 'fa-globe', plugin: 'fa-puzzle-piece', prompt: 'fa-terminal' };
+      tabsContainer.innerHTML = categories.map(cat =>
+        '<button class="tab-btn'+(cat===currentCategory?' active':'')+'" data-category="'+cat+'">' +
+        '<i class="fas '+tabIcons[cat]+'"></i> '+t.tabs[cat]+'</button>'
+      ).join('');
+      tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() { currentCategory = this.dataset.category; renderAll(); });
+      });
+      renderTools();
+    }
+
+    function getFilteredTools() {
+      let list;
+      if (currentCategory === 'all') {
+        list = [...tools];
+      } else if (currentCategory === 'feature') {
+        list = tools.filter(t => t.featured);
+      } else {
+        list = tools.filter(t => t.category === currentCategory);
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        list = list.filter(t => t.name.zh.toLowerCase().includes(q) || t.name.en.toLowerCase().includes(q));
+      }
+      if (currentSort === 'name') {
+        list.sort((a,b) => a.name[currentLang].localeCompare(b.name[currentLang]));
+      }
+      return list;
+    }
+
+    function renderTools() {
+      const t = i18n[currentLang];
+      const container = document.getElementById('toolsContainer');
+      const filtered = getFilteredTools();
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>'+t.empty+'</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(tool => {
+        const name = tool.name[currentLang];
+        const summary = tool.summary[currentLang];
+        const tags = tool.tags[currentLang];
+        const catLabel = t.categoryLabels[tool.category];
+        const singleClass = tool.screenshots.length === 1 ? ' single' : '';
+        const featuredHtml = tool.featured ? '<span class="featured-badge"><i class="fas fa-star" style="margin-right:3px;font-size:0.55rem;"></i>'+(currentLang==='zh'?'重点':'Featured')+'</span>' : '';
+
+        const screenshotsHtml = tool.screenshots.map((src, idx) =>
+          '<div class="screen-thumb" onclick="event.stopPropagation();openLightbox(\''+src+'\')">' +
+          '<img src="'+src+'" alt="'+name+' '+(idx+1)+'" loading="lazy">' +
+          '<span class="zoom-icon"><i class="fas fa-search-plus"></i></span></div>'
+        ).join('');
+
+        const tagsHtml = tags.map(tag => '<span class="feature-tag">'+tag+'</span>').join('');
+
+        return '<div class="tool-card" data-id="'+tool.id+'">' +
+          featuredHtml +
+          '<div class="card-header"><div class="tool-icon"><i class="fas '+tool.icon+'"></i></div>' +
+          '<div><span class="tool-name">'+name+'</span><span class="tool-category">'+catLabel+'</span></div></div>' +
+          '<div class="summary">'+summary+'</div>' +
+          '<div class="screenshot-area'+singleClass+'">'+screenshotsHtml+'</div>' +
+          '<div class="feature-tags">'+tagsHtml+'</div>' +
+          '<button class="detail-btn" onclick="event.stopPropagation();openModal('+tool.id+')"><i class="fas fa-expand-alt"></i> '+t.detail+'</button>' +
+          '</div>';
+      }).join('');
+
+      // Animate cards in
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.tool-card').forEach((card, i) => {
+          setTimeout(() => card.classList.add('visible'), i * 80);
+        });
+      });
+    }
+
+    // === LIGHTBOX ===
+    function openLightbox(src) {
+      const img = document.getElementById('lightbox-img');
+      img.src = src; img.classList.remove('zoomed');
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+      document.getElementById('lightbox-img').src = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeModal(); } });
+    document.getElementById('lightbox-img').addEventListener('click', function(e) {
+      e.stopPropagation(); this.classList.toggle('zoomed');
+    });
+
+    // === MODAL ===
+    function openModal(id) {
+      const tool = tools.find(t => t.id === id);
+      if (!tool) return;
+      const t = i18n[currentLang];
+      const name = tool.name[currentLang];
+      const catLabel = t.categoryLabels[tool.category];
+      const features = tool.features[currentLang];
+      const scenes = tool.scenes[currentLang];
+
+      const featuresHtml = features.map(f => '<li><i class="fas fa-check-circle"></i> '+f+'</li>').join('');
+      const scenesHtml = scenes.map(s => '<li><i class="fas fa-lightbulb"></i> '+s+'</li>').join('');
+      const screenshotsHtml = tool.screenshots.map(src =>
+        '<img src="'+src+'" onclick="event.stopPropagation();openLightbox(\''+src+'\')" alt="'+name+'">'
+      ).join('');
+
+      document.getElementById('modalContent').innerHTML =
+        '<button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>' +
+        '<div class="modal-title"><i class="fas '+tool.icon+'" style="margin-right:0.5rem;color:#ff6b35;"></i> '+name+'</div>' +
+        '<div class="modal-category">'+catLabel+'</div>' +
+        '<div class="modal-desc">'+tool.summary[currentLang]+'</div>' +
+        '<div class="modal-section-title"><i class="fas fa-star"></i> '+t.features+'</div>' +
+        '<ul class="modal-features">'+featuresHtml+'</ul>' +
+        '<div class="modal-section-title"><i class="fas fa-rocket"></i> '+t.scenes+'</div>' +
+        '<ul class="modal-features">'+scenesHtml+'</ul>' +
+        '<div class="modal-section-title"><i class="fas fa-image"></i> Screenshots</div>' +
+        '<div class="modal-screenshots">'+screenshotsHtml+'</div>';
+
+      document.getElementById('modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      if (!document.getElementById('lightbox').classList.contains('active')) {
+        document.body.style.overflow = '';
+      }
+    }
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // === SORT ===
+    function toggleSort() {
+      currentSort = currentSort === 'default' ? 'name' : 'default';
+      renderAll();
+    }
+
+    // === SEARCH ===
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim();
+      renderTools();
+    }
+
+    // === LANG TOGGLE ===
+    function toggleLang() { currentLang = currentLang === 'zh' ? 'en' : 'zh'; renderAll(); }
+
+    // Init
+    renderAll();
+  </script>
+</body>
+</html>
